@@ -40,7 +40,7 @@ async fn health() -> Result<impl Responder, ApiError> {
 }
 
 #[get("/openapi.yml")]
-async fn openapifile(req: HttpRequest) -> Result<fs::NamedFile, Error> {
+async fn openapifile() -> Result<impl Responder, ApiError> {
     let path: std::path::PathBuf = "/openapi.yml";
     let file = fs::NamedFile::open(path)?;
     Ok(file)

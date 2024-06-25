@@ -37,6 +37,16 @@ jobs:
       - name: Setup cache
         uses: Swatinem/rust-cache@v2
 
+      #- name: Set enviroment variables
+      #  run: |
+      #    echo "APP_DEBUG=0" >> .env
+      #    echo "APP_URL=http://localhost" >> .env
+      #    echo "DATABASE_URL=postgres://user:password@localhost/schema" >> .env
+      #    echo "PORT=8080" >> .env
+      #    echo "GITHUB_CLIENT_ID=${ secrets.GH_APP_CLIENT_ID }}" >> .env
+      #    echo "GITHUB_CLIENT_SECRET=${ secrets.GH_APP_CLIENT_SECRET }}" >> .env
+
+
       - name: Build
         id: build
         run: |

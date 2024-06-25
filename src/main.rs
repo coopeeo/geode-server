@@ -1,4 +1,5 @@
 use actix_cors::Cors;
+use actix_files as fs;
 use actix_web::{
     get,
     middleware::Logger,
@@ -36,6 +37,13 @@ struct Args {
 #[get("/")]
 async fn health() -> Result<impl Responder, ApiError> {
     Ok(web::Json("The Geode Index is running"))
+}
+
+#[get("/openapi.yml")]
+async fn openapifile(req: HttpRequest) -> Result<fs::NamedFile, Error> {
+    let path: std::path::PathBuf = "/openapi.yml";
+    let file = fs::NamedFile::open(path)?;
+    Ok(file)
 }
 
 #[tokio::main]
@@ -118,6 +126,8 @@ async fn main() -> anyhow::Result<()> {
             .service(endpoints::developers::update_developer)
             .service(endpoints::tags::index)
             .service(endpoints::stats::get_stats)
+            .service(openapifile)
+            .service(fs::Files::new("/static", ".").show_files_listing())
             .service(health)
     })
     .bind((addr, port))?;

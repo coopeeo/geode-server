@@ -1,0 +1,49 @@
+name: Build Index
+
+on:
+  push:
+    branches:
+      - "**"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+        - name: Windows
+          target: x86_64-pc-windows-gnu
+        - name: Linux
+          target: aarch64-unknown-linux-gnu
+
+    name: Build Index for ${{ matrix.config.name }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install stuff
+        run: sudo apt-get update && sudo apt-get install --assume-yes --no-install-recommends g++-aarch64-linux-gnu mingw-w64
+
+      - name: Setup env
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+
+      - name: Install rust
+        run: |
+          rustup toolchain install stable --profile minimal
+          rustup target add ${{ matrix.config.target }}
+
+      - name: Setup cache
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build
+        id: build
+        run: |
+          cargo build --release --target ${{ matrix.config.target }}
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Build Artifacts for ${{ matrix.config.name }}
+          path: target/${{ matrix.config.target }}/release/
